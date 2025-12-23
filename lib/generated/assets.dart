@@ -2,9 +2,10 @@
 class Assets {
   Assets._();
 
-  static const String fontsPlusJakartaSansRegular = 'assets/fonts/PlusJakartaSans-Regular.ttf';
+  static const String fontsPlusJakartaSansRegular =
+      'assets/fonts/PlusJakartaSans-Regular.ttf';
   static const String imagesHand = 'assets/images/hand.svg';
   static const String imagesLogo = 'assets/images/logo.svg';
   static const String imagesPana = 'assets/images/pana.png';
-
+  static const String imagesPerson = 'assets/images/person.png';
 }
