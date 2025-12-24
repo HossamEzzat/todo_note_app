@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_note_app/screens/home_screen.dart';
 
 class Welcome extends StatefulWidget {
@@ -120,8 +121,10 @@ class _WelcomeState extends State<Welcome> {
                 ),
                 SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      final prefs = await SharedPreferences.getInstance();
+                      prefs.setString("name", _nameController.text);
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => HomeScreen()),

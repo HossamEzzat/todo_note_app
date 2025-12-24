@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String? name;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getname();
+  }
+
+  void getname() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString("name");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,19 +42,19 @@ class HomeScreen extends StatelessWidget {
                     backgroundImage: AssetImage("assets/images/person.png"),
                   ),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Good Evening, Hossam!",
-                          style: TextStyle(
+                          "Good Evening,$name)",
+                          style: const TextStyle(
                             color: Color(0xffFFFCFC),
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        Text(
+                        const Text(
                           "One task at a time. One step closer.",
                           style: TextStyle(
                             color: Color(0xffC6C6C6),
