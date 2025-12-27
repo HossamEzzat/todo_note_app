@@ -125,7 +125,7 @@ class _WelcomeState extends State<Welcome> {
                     if (_formKey.currentState!.validate()) {
                       final prefs = await SharedPreferences.getInstance();
                       prefs.setString("name", _nameController.text);
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => HomeScreen()),
                       );
