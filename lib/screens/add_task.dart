@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_screen.dart';
 
@@ -170,6 +173,14 @@ class _AddTaskState extends State<AddTask> {
                 icon: Icon(Icons.add),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
+                    final task = {
+                      "task": taskController.text,
+                      "description": descriptionController.text,
+                      "isHighPriority": isHighPriority,
+                    };
+                    var encodeTask = jsonEncode(task);
+                    final prefs = await SharedPreferences.getInstance();
+                    prefs.setString("tasks", encodeTask);
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),
