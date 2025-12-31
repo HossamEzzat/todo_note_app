@@ -172,15 +172,22 @@ class _AddTaskState extends State<AddTask> {
               ElevatedButton.icon(
                 icon: Icon(Icons.add),
                 onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
                   if (_formKey.currentState!.validate()) {
                     final task = {
                       "task": taskController.text,
                       "description": descriptionController.text,
                       "isHighPriority": isHighPriority,
                     };
-                    var encodeTask = jsonEncode(task);
-                    final prefs = await SharedPreferences.getInstance();
-                    prefs.setString("tasks", encodeTask);
+                    final taskJson = prefs.getString("tasks");
+                    var listTasks = [];
+                    if (taskJson != null) {
+                      listTasks = jsonDecode(taskJson);
+                    }
+                    listTasks.add(task);
+                    var encodeTasks = jsonEncode(listTasks);
+                    prefs.setString("tasks", encodeTasks);
+
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),

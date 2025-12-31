@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,18 +15,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? name;
+  List<String> tasks = [];
+  List<dynamic> taskAfterDecode = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getname();
+    loadTasks();
   }
 
   void getname() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       name = prefs.getString("name");
+    });
+  }
+
+  loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      tasks = prefs.getStringList("tasks") ?? [];
+      taskAfterDecode = tasks.map((task) => jsonDecode(task)).toList();
     });
   }
 
