@@ -175,8 +175,8 @@ class _AddTaskState extends State<AddTask> {
                   final prefs = await SharedPreferences.getInstance();
                   if (_formKey.currentState!.validate()) {
                     final task = {
-                      "task": taskController.text,
-                      "description": descriptionController.text,
+                      "taskName": taskController.text,
+                      "taskDescription": descriptionController.text,
                       "isHighPriority": isHighPriority,
                     };
                     final taskJson = prefs.getString("tasks");
