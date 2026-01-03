@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_note_app/models/task_model.dart';
 
 import 'home_screen.dart';
 
@@ -174,17 +175,17 @@ class _AddTaskState extends State<AddTask> {
                 onPressed: () async {
                   final prefs = await SharedPreferences.getInstance();
                   if (_formKey.currentState!.validate()) {
-                    final task = {
-                      "taskName": taskController.text,
-                      "taskDescription": descriptionController.text,
-                      "isHighPriority": isHighPriority,
-                    };
+                    final task = TaskModel(
+                      taskName: taskController.text,
+                      taskDescription: descriptionController.text,
+                      isHighPriority: isHighPriority,
+                    );
                     final taskJson = prefs.getString("tasks");
                     var listTasks = [];
                     if (taskJson != null) {
                       listTasks = jsonDecode(taskJson);
                     }
-                    listTasks.add(task);
+                    listTasks.add(task.toJson());
                     var encodeTasks = jsonEncode(listTasks);
                     prefs.setString("tasks", encodeTasks);
 
