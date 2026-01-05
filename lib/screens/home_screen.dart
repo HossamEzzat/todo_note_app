@@ -157,21 +157,29 @@ class _HomeScreenState extends State<HomeScreen> {
       itemCount: _tasks.length,
       itemBuilder: (context, index) {
         final task = _tasks[index];
-        return Card(
-          color: const Color(0xff242424),
-          margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            title: Text(
-              task.taskName,
-              style: const TextStyle(color: Colors.white),
+        return Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Container(
+            alignment: Alignment.center,
+            height: 56,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Color(0xff282828),
+              borderRadius: BorderRadiusGeometry.circular(20),
             ),
-            subtitle: Text(
-              task.taskDescription,
-              style: const TextStyle(color: Colors.grey),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  task.taskName,
+                  style: TextStyle(color: Color(0xffFFFCFC), fontSize: 16),
+                ),
+                Text(
+                  task.taskName,
+                  style: TextStyle(color: Color(0xffC6C6C6), fontSize: 14),
+                ),
+              ],
             ),
-            trailing: task.isHighPriority
-                ? const Icon(Icons.priority_high, color: Colors.red)
-                : null,
           ),
         );
       },
