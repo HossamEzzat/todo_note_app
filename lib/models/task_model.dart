@@ -2,11 +2,13 @@ class TaskModel {
   final String taskName;
   final String taskDescription;
   final bool isHighPriority;
+  bool isCompleted;
 
   TaskModel({
     required this.taskName,
     required this.taskDescription,
     required this.isHighPriority,
+    this.isCompleted = false,
   });
 
   // Convert a Map (from JSON) into a TaskModel object
@@ -15,6 +17,7 @@ class TaskModel {
       taskName: json['taskName'] ?? '',
       taskDescription: json['taskDescription'] ?? '',
       isHighPriority: json['isHighPriority'] ?? false,
+      isCompleted: json['isCompleted'] ?? false,
     );
   }
 
@@ -24,6 +27,7 @@ class TaskModel {
       'taskName': taskName,
       'taskDescription': taskDescription,
       'isHighPriority': isHighPriority,
+      'isCompleted': isCompleted,
     };
   }
 }

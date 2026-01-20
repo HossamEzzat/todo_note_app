@@ -15,63 +15,84 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String? _userName;
+  String _userName = "User";
   List<TaskModel> _tasks = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    _loadData();
   }
 
-  // Combined initialization for better performance
-  Future<void> _initializeData() async {
+  Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
+    final tasksJson = prefs.getString("tasks");
+
     setState(() {
       _userName = prefs.getString("name") ?? "User";
-      _loadTasksFromPrefs(prefs);
+      _tasks = tasksJson != null
+          ? (jsonDecode(tasksJson) as List)
+                .map((item) => TaskModel.fromJson(item))
+                .toList()
+          : [];
       _isLoading = false;
     });
   }
 
-  void _loadTasksFromPrefs(SharedPreferences prefs) {
-    final String? tasksJson = prefs.getString("tasks");
-    if (tasksJson != null) {
-      final List<dynamic> decodedData = jsonDecode(tasksJson);
-      _tasks = decodedData.map((item) => TaskModel.fromJson(item)).toList();
-    }
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      "tasks",
+      jsonEncode(_tasks.map((task) => task.toJson()).toList()),
+    );
   }
 
-  // Refreshes data when returning from AddTask screen
+  void _toggleTask(int index) {
+    setState(() {
+      _tasks[index].isCompleted = !_tasks[index].isCompleted;
+      _saveTasks();
+    });
+  }
+
   Future<void> _navigateToAddTask() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddTask()),
+      MaterialPageRoute(builder: (_) => AddTask()),
     );
-    if (result == true) _initializeData();
+    if (result == true) _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff181818),
-      floatingActionButton: _buildFab(),
+      backgroundColor: const Color(0xFF181818),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _navigateToAddTask,
+        label: const Text(
+          "Add Task",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        icon: const Icon(Icons.add),
+        backgroundColor: const Color(0xFF15B86C),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
               const SizedBox(height: 32),
-              _buildGreetingSection(),
+              _buildGreeting(),
               const SizedBox(height: 24),
               Expanded(
                 child: _isLoading
                     ? const Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xff15B86C),
+                          color: Color(0xFF15B86C),
                         ),
                       )
                     : _buildTaskList(),
@@ -98,45 +119,44 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 "Good Evening, $_userName",
                 style: GoogleFonts.plusJakartaSans(
-                  color: const Color(0xffFFFCFC),
+                  color: const Color(0xFFFFFCFC),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               const Text(
                 "One task at a time. One step closer.",
-                style: TextStyle(color: Color(0xffC6C6C6), fontSize: 13),
+                style: TextStyle(color: Color(0xFFC6C6C6), fontSize: 13),
               ),
             ],
           ),
         ),
-        _buildThemeToggle(),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Color(0xFF1F1F1F),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.sunny, color: Colors.orangeAccent, size: 20),
+        ),
       ],
     );
   }
 
-  Widget _buildGreetingSection() {
+  Widget _buildGreeting() {
+    final textStyle = GoogleFonts.plusJakartaSans(
+      color: const Color(0xFFFFFCFC),
+      fontSize: 28,
+      fontWeight: FontWeight.w500,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Yuhuu, Your work is",
-          style: GoogleFonts.plusJakartaSans(
-            color: const Color(0xffFFFCFC),
-            fontSize: 28,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text("Yuhuu, Your work is", style: textStyle),
         Row(
           children: [
-            Text(
-              "almost done! ",
-              style: GoogleFonts.plusJakartaSans(
-                color: const Color(0xffFFFCFC),
-                fontSize: 28,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text("almost done! ", style: textStyle),
             SvgPicture.asset("assets/images/hand.svg", height: 28),
           ],
         ),
@@ -149,65 +169,70 @@ class _HomeScreenState extends State<HomeScreen> {
       return Center(
         child: Text(
           "No tasks for today!",
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(color: Colors.grey[600], fontSize: 16),
         ),
       );
     }
-    return ListView.builder(
+
+    return ListView.separated(
       itemCount: _tasks.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final task = _tasks[index];
-        return Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Container(
-            alignment: Alignment.center,
-            height: 56,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Color(0xff282828),
-              borderRadius: BorderRadiusGeometry.circular(20),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  task.taskName,
-                  style: TextStyle(color: Color(0xffFFFCFC), fontSize: 16),
+        return Container(
+          height: 56,
+          padding: const EdgeInsets.only(left: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF282828),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Checkbox(
+                value: task.isCompleted,
+                onChanged: (_) => _toggleTask(index),
+                activeColor: const Color(0xFF15B86C),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                Text(
-                  task.taskName,
-                  style: TextStyle(color: Color(0xffC6C6C6), fontSize: 14),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.taskName,
+                      style: TextStyle(
+                        color: task.isCompleted
+                            ? const Color(0xFFA0A0A0)
+                            : const Color(0xFFFFFCFC),
+                        fontSize: 16,
+                        decoration: task.isCompleted
+                            ? TextDecoration.lineThrough
+                            : null,
+                        decorationColor: const Color(0xFFA0A0A0),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      task.taskDescription,
+                      style: const TextStyle(
+                        color: Color(0xFFC6C6C6),
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+            ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildThemeToggle() {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        shape: BoxShape.circle,
-      ),
-      child: const Icon(Icons.sunny, color: Colors.orangeAccent, size: 20),
-    );
-  }
-
-  Widget _buildFab() {
-    return FloatingActionButton.extended(
-      onPressed: _navigateToAddTask,
-      label: const Text(
-        "Add Task",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      icon: const Icon(Icons.add),
-      backgroundColor: const Color(0xff15B86C),
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     );
   }
 }
