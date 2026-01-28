@@ -8,7 +8,7 @@ import 'package:todo_note_app/models/task_model.dart';
 import 'home_screen.dart';
 
 class AddTask extends StatefulWidget {
-  AddTask({super.key});
+  const AddTask({super.key});
 
   @override
   State<AddTask> createState() => _AddTaskState();
@@ -173,6 +173,8 @@ class _AddTaskState extends State<AddTask> {
               ElevatedButton.icon(
                 icon: Icon(Icons.add),
                 onPressed: () async {
+                  if (!mounted) return; // Check if widget is still mounted
+
                   final prefs = await SharedPreferences.getInstance();
                   if (_formKey.currentState!.validate()) {
                     final task = TaskModel(
@@ -191,7 +193,9 @@ class _AddTaskState extends State<AddTask> {
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => HomeScreen(),
+                      ), // Pass the context inside the builder function
                     );
                   }
                 },

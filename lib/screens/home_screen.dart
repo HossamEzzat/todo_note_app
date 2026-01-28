@@ -196,6 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
+              SizedBox(width: 8),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -228,7 +229,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                color: const Color(0xFFA0A0A0),
+                onPressed: () {},
+              ),
             ],
           ),
         );
