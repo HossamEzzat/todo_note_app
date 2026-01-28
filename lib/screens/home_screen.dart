@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -88,6 +90,15 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 32),
               _buildGreeting(),
               const SizedBox(height: 24),
+              const Text(
+                "My Tasks",
+                style: TextStyle(
+                  color: Color(0xFFFFFCFC),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 16),
               Expanded(
                 child: _isLoading
                     ? const Center(
@@ -175,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return ListView.separated(
+      padding: EdgeInsets.only(bottom: 40),
       itemCount: _tasks.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
@@ -231,7 +243,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert),
-                color: const Color(0xFFA0A0A0),
+                color: task.isCompleted
+                    ? const Color(0xFFA0A0A0)
+                    : const Color(0xFFFFFCFC),
                 onPressed: () {},
               ),
             ],

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -173,15 +175,15 @@ class _AddTaskState extends State<AddTask> {
               ElevatedButton.icon(
                 icon: Icon(Icons.add),
                 onPressed: () async {
-                  if (!mounted) return; // Check if widget is still mounted
-
-                  final prefs = await SharedPreferences.getInstance();
                   if (_formKey.currentState!.validate()) {
                     final task = TaskModel(
                       taskName: taskController.text,
                       taskDescription: descriptionController.text,
                       isHighPriority: isHighPriority,
                     );
+
+                    final prefs = await SharedPreferences.getInstance();
+
                     final taskJson = prefs.getString("tasks");
                     var listTasks = [];
                     if (taskJson != null) {
@@ -195,7 +197,7 @@ class _AddTaskState extends State<AddTask> {
                       context,
                       MaterialPageRoute(
                         builder: (BuildContext context) => HomeScreen(),
-                      ), // Pass the context inside the builder function
+                      ),
                     );
                   }
                 },
