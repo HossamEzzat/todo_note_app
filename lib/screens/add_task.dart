@@ -111,12 +111,6 @@ class _AddTaskState extends State<AddTask> {
                     SizedBox(height: 8),
                     TextFormField(
                       controller: descriptionController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter task description";
-                        }
-                        return null;
-                      },
                       decoration: InputDecoration(
                         hintText: "Enter task description",
                         hintStyle: GoogleFonts.poppins(
