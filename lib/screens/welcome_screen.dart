@@ -1,9 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_note_app/screens/main_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_note_app/providers/task_provider.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -31,13 +29,13 @@ class _WelcomeState extends State<Welcome> {
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset("assets/images/logo.svg"),
-                    SizedBox(width: 16),
-                    Text(
+                    const SizedBox(width: 16),
+                    const Text(
                       "  Tasky",
                       style: TextStyle(
                         fontFamily: "PlusJakartaSans",
@@ -48,15 +46,14 @@ class _WelcomeState extends State<Welcome> {
                     ),
                   ],
                 ),
-                SizedBox(height: 108),
+                const SizedBox(height: 108),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Welcome To Tasky ",
                       style: TextStyle(
                         fontFamily: "PlusJakartaSans",
-
                         color: Color(0xffFFFCFC),
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
@@ -65,7 +62,7 @@ class _WelcomeState extends State<Welcome> {
                     SvgPicture.asset("assets/images/hand.svg"),
                   ],
                 ),
-                Text(
+                const Text(
                   "Your productivity journey starts here.",
                   style: TextStyle(
                     fontFamily: "PlusJakartaSans",
@@ -74,16 +71,15 @@ class _WelcomeState extends State<Welcome> {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 Image.asset("assets/images/pana.png", width: 215, height: 204),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 28),
-                      Text(
+                      const SizedBox(height: 28),
+                      const Text(
                         "Full Name",
                         style: TextStyle(
                           color: Color(0xffFFFCFC),
@@ -91,20 +87,19 @@ class _WelcomeState extends State<Welcome> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: _nameController,
-                        style: TextStyle(color: Color(0xffFFFCFC)),
+                        style: const TextStyle(color: Color(0xffFFFCFC)),
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: BorderSide.none,
                           ),
-                          fillColor: Color(0xff282828),
+                          fillColor: const Color(0xff282828),
                           filled: true,
-
                           hintText: "Name",
-                          hintStyle: TextStyle(color: Color(0xff6D6D6D)),
+                          hintStyle: const TextStyle(color: Color(0xff6D6D6D)),
                         ),
                         cursorColor: Colors.white,
                         validator: (value) {
@@ -120,29 +115,26 @@ class _WelcomeState extends State<Welcome> {
                     ],
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () async {
+                  onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      final prefs = await SharedPreferences.getInstance();
-                      prefs.setString("name", _nameController.text);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => MainScreen()),
+                      context.read<TaskProvider>().updateUserName(
+                        _nameController.text,
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff15b86c),
-                    foregroundColor: Color(0xffFFFCFC),
+                    backgroundColor: const Color(0xff15b86c),
+                    foregroundColor: const Color(0xffFFFCFC),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    fixedSize: Size(343, 40),
+                    fixedSize: const Size(343, 40),
                   ),
-                  child: Text("Let’s Get Started"),
+                  child: const Text("Let’s Get Started"),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
               ],
             ),
           ),

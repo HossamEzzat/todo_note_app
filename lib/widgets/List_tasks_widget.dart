@@ -6,10 +6,12 @@ class ListTasksWidget extends StatelessWidget {
     super.key,
     required this.tasks,
     required this.toggleTask,
+    required this.deleteTask,
   });
 
   final List<TaskModel> tasks;
-  final Function(int index) toggleTask;
+  final Function(TaskModel task) toggleTask;
+  final Function(TaskModel task) deleteTask;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class ListTasksWidget extends StatelessWidget {
             ),
           )
         : ListView.separated(
-            padding: EdgeInsets.only(bottom: 40),
+            padding: const EdgeInsets.only(bottom: 40),
             itemCount: tasks.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
@@ -37,13 +39,13 @@ class ListTasksWidget extends StatelessWidget {
                   children: [
                     Checkbox(
                       value: task.isCompleted,
-                      onChanged: (value) => toggleTask(index),
+                      onChanged: (value) => toggleTask(task),
                       activeColor: const Color(0xFF15B86C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -77,12 +79,47 @@ class ListTasksWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      color: task.isCompleted
-                          ? const Color(0xFFA0A0A0)
-                          : const Color(0xFFFFFCFC),
-                      onPressed: () {},
+                    if (task.isHighPriority)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          "High",
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: Color(0xFFFFFCFC),
+                      ),
+                      onSelected: (value) {
+                        if (value == 'delete') {
+                          deleteTask(task);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text('Delete'),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

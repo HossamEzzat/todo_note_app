@@ -1,72 +1,24 @@
-// ignore_for_file: unnecessary_underscores
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_note_app/models/task_model.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_note_app/providers/task_provider.dart';
 import 'package:todo_note_app/screens/add_task.dart';
 import 'package:todo_note_app/widgets/List_tasks_widget.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  String _userName = "User";
-  List<TaskModel> _tasks = [];
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final tasksJson = prefs.getString("tasks");
-    setState(() {
-      _userName = prefs.getString("name") ?? "User";
-      _tasks = tasksJson != null
-          ? (jsonDecode(tasksJson) as List)
-                .map((item) => TaskModel.fromJson(item))
-                .toList()
-          : [];
-    });
-  }
-
-  void _toggleTask(int index) {
-    setState(() {
-      _tasks[index].isCompleted = !_tasks[index].isCompleted;
-      _saveTasks();
-    });
-  }
-
-  Future<void> _saveTasks() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      "tasks",
-      jsonEncode(_tasks.map((task) => task.toJson()).toList()),
-    );
-  }
-
-  Future<void> _navigateToAddTask() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AddTask()),
-    );
-    if (result == true) _loadData();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToAddTask,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddTask()),
+          );
+        },
         label: const Text(
           "Add Task",
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -79,33 +31,41 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 32),
-              _buildGreeting(),
-              const SizedBox(height: 24),
-              const Text(
-                "My Tasks",
-                style: TextStyle(
-                  color: Color(0xFFFFFCFC),
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListTasksWidget(tasks: _tasks, toggleTask: _toggleTask),
-              ),
-            ],
+          child: Consumer<TaskProvider>(
+            builder: (context, provider, _) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(provider.userName),
+                  const SizedBox(height: 32),
+                  _buildGreeting(),
+                  const SizedBox(height: 24),
+                  const Text(
+                    "My Tasks",
+                    style: TextStyle(
+                      color: Color(0xFFFFFCFC),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListTasksWidget(
+                      tasks: provider.tasks,
+                      toggleTask: (task) => provider.toggleTaskState(task),
+                      deleteTask: (task) => provider.deleteTask(task),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(String userName) {
     return Row(
       children: [
         const CircleAvatar(
@@ -118,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Good Evening, $_userName",
+                "Good Evening, $userName",
                 style: GoogleFonts.plusJakartaSans(
                   color: const Color(0xFFFFFCFC),
                   fontWeight: FontWeight.bold,

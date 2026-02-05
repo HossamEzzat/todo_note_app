@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:todo_note_app/screens/compelte_screen.dart';
+import 'package:todo_note_app/screens/complete_screen.dart';
 import 'package:todo_note_app/screens/home_screen.dart';
 import 'package:todo_note_app/screens/profile_screen.dart';
 import 'package:todo_note_app/screens/todo_screen.dart';
