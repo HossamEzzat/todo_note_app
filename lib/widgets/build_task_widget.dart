@@ -1,61 +1,19 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_note_app/models/task_model.dart';
 
-class BuildTaskWidget extends StatefulWidget {
-  const BuildTaskWidget({super.key});
+class BuildTaskWidget extends StatelessWidget {
+  const BuildTaskWidget({
+    super.key,
+    required this.tasks,
+    required this.toggleTask,
+  });
 
-  @override
-  State<BuildTaskWidget> createState() => _BuildTaskWidgetState();
-}
-
-class _BuildTaskWidgetState extends State<BuildTaskWidget> {
-  List<TaskModel> _tasks = [];
-  bool isLoading = true;
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final tasksJson = prefs.getString("tasks");
-
-    setState(() {
-      _tasks = tasksJson != null
-          ? (jsonDecode(tasksJson) as List)
-                .map((item) => TaskModel.fromJson(item))
-                .toList()
-          : [];
-      isLoading = false;
-    });
-  }
-
-  Future<void> _saveTasks() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      "tasks",
-      jsonEncode(_tasks.map((task) => task.toJson()).toList()),
-    );
-  }
-
-  void _toggleTask(int index) {
-    setState(() {
-      _tasks[index].isCompleted = !_tasks[index].isCompleted;
-      _saveTasks();
-    });
-  }
+  final List<TaskModel> tasks;
+  final Function(int index) toggleTask;
 
   @override
   Widget build(BuildContext context) {
-    return (isLoading)
-        ? const Center(
-            child: CircularProgressIndicator(color: Color(0xFF15B86C)),
-          )
-        : (_tasks.isEmpty)
+    return (tasks.isEmpty)
         ? Center(
             child: Text(
               "No tasks for today!",
@@ -64,10 +22,10 @@ class _BuildTaskWidgetState extends State<BuildTaskWidget> {
           )
         : ListView.separated(
             padding: EdgeInsets.only(bottom: 40),
-            itemCount: _tasks.length,
+            itemCount: tasks.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
-              final task = _tasks[index];
+              final task = tasks[index];
               return Container(
                 height: 56,
                 padding: const EdgeInsets.only(left: 4),
@@ -79,7 +37,7 @@ class _BuildTaskWidgetState extends State<BuildTaskWidget> {
                   children: [
                     Checkbox(
                       value: task.isCompleted,
-                      onChanged: (_) => _toggleTask(index),
+                      onChanged: (value) => toggleTask(index),
                       activeColor: const Color(0xFF15B86C),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),

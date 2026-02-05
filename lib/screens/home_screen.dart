@@ -19,7 +19,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _userName = "User";
-
+  List<TaskModel> _tasks = [];
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -28,9 +29,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
+    final tasksJson = prefs.getString("tasks");
     setState(() {
       _userName = prefs.getString("name") ?? "User";
+      _tasks = tasksJson != null
+          ? (jsonDecode(tasksJson) as List)
+                .map((item) => TaskModel.fromJson(item))
+                .toList()
+          : [];
+      isLoading = false;
     });
+  }
+
+  void _toggleTask(int index) {
+    setState(() {
+      _tasks[index].isCompleted = !_tasks[index].isCompleted;
+      _saveTasks();
+    });
+  }
+
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      "tasks",
+      jsonEncode(_tasks.map((task) => task.toJson()).toList()),
+    );
   }
 
   Future<void> _navigateToAddTask() async {
@@ -74,7 +97,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Expanded(child: BuildTaskWidget()),
+              Expanded(
+                child: (isLoading)
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF15B86C),
+                        ),
+                      )
+                    : BuildTaskWidget(tasks: _tasks, toggleTask: _toggleTask),
+              ),
             ],
           ),
         ),
