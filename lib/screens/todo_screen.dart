@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:todo_note_app/widgets/build_task_widget.dart';
 
-class TodoScreen extends StatefulWidget {
+class TodoScreen extends StatelessWidget {
   const TodoScreen({super.key});
 
-  @override
-  State<TodoScreen> createState() => _TodoScreenState();
-}
-
-class _TodoScreenState extends State<TodoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('To Do Tasks')),
-      body: ListView.builder(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: BuildTaskWidget(),
+      ),
     );
   }
 }

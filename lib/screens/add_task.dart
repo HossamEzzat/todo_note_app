@@ -8,8 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_note_app/models/task_model.dart';
 import 'package:todo_note_app/screens/main_screen.dart';
 
-import 'home_screen.dart';
-
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
 
