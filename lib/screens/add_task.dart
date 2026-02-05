@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_note_app/models/task_model.dart';
+import 'package:todo_note_app/screens/main_screen.dart';
 
 import 'home_screen.dart';
 
@@ -34,21 +35,7 @@ class _AddTaskState extends State<AddTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff181818),
-
-      appBar: AppBar(
-        backgroundColor: const Color(0xff181818),
-        elevation: 0,
-        title: Text(
-          "New Task",
-          style: GoogleFonts.plusJakartaSans(
-            color: Color(0xffFFFCFC),
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
+      appBar: AppBar(title: Text("New Task")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -190,7 +177,7 @@ class _AddTaskState extends State<AddTask> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (BuildContext context) => HomeScreen(),
+                        builder: (BuildContext context) => MainScreen(),
                       ),
                     );
                   }

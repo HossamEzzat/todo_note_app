@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_note_app/screens/home_screen.dart';
+import 'package:todo_note_app/screens/main_screen.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({super.key});
@@ -26,7 +26,6 @@ class _WelcomeState extends State<Welcome> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xff181818),
         body: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -129,7 +128,7 @@ class _WelcomeState extends State<Welcome> {
                       prefs.setString("name", _nameController.text);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(builder: (context) => MainScreen()),
                       );
                     }
                   },
@@ -143,6 +142,7 @@ class _WelcomeState extends State<Welcome> {
                   ),
                   child: Text("Let’s Get Started"),
                 ),
+                SizedBox(height: 40),
               ],
             ),
           ),

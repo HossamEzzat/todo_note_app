@@ -68,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF181818),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _navigateToAddTask,
         label: const Text(
@@ -229,15 +228,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      task.taskDescription,
-                      style: const TextStyle(
-                        color: Color(0xFFC6C6C6),
-                        fontSize: 14,
+                    if (task.taskDescription.isNotEmpty)
+                      Text(
+                        task.taskDescription,
+                        style: const TextStyle(
+                          color: Color(0xFFC6C6C6),
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
                   ],
                 ),
               ),
