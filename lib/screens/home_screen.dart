@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_note_app/models/task_model.dart';
 import 'package:todo_note_app/screens/add_task.dart';
-import 'package:todo_note_app/widgets/build_task_widget.dart';
+import 'package:todo_note_app/widgets/List_tasks_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _userName = "User";
   List<TaskModel> _tasks = [];
-  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -37,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 .map((item) => TaskModel.fromJson(item))
                 .toList()
           : [];
-      isLoading = false;
     });
   }
 
@@ -98,13 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: (isLoading)
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF15B86C),
-                        ),
-                      )
-                    : BuildTaskWidget(tasks: _tasks, toggleTask: _toggleTask),
+                child: ListTasksWidget(tasks: _tasks, toggleTask: _toggleTask),
               ),
             ],
           ),

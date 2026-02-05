@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_note_app/models/task_model.dart';
-import 'package:todo_note_app/widgets/build_task_widget.dart';
+import 'package:todo_note_app/widgets/List_tasks_widget.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
@@ -13,7 +13,6 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> {
-  bool isLoading = true;
   List<TaskModel> tasks = [];
 
   @override
@@ -31,7 +30,7 @@ class _TodoScreenState extends State<TodoScreen> {
                 .map((item) => TaskModel.fromJson(item))
                 .toList()
           : [];
-      isLoading = false;
+      tasks = tasks.where((task) => !task.isCompleted).toList();
     });
   }
 
@@ -48,6 +47,7 @@ class _TodoScreenState extends State<TodoScreen> {
       "tasks",
       jsonEncode(tasks.map((task) => task.toJson()).toList()),
     );
+    _loadData();
   }
 
   @override
@@ -56,7 +56,7 @@ class _TodoScreenState extends State<TodoScreen> {
       appBar: AppBar(title: const Text('To Do Tasks')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: BuildTaskWidget(tasks: tasks, toggleTask: _toggleTask),
+        child: ListTasksWidget(tasks: tasks, toggleTask: _toggleTask),
       ),
     );
   }

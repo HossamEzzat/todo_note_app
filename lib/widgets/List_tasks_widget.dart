@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:todo_note_app/models/task_model.dart';
 
-class BuildTaskWidget extends StatelessWidget {
-  const BuildTaskWidget({
+class ListTasksWidget extends StatelessWidget {
+  const ListTasksWidget({
     super.key,
     required this.tasks,
     required this.toggleTask,
