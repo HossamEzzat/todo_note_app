@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/task_model.dart';
 import '../services/task_service.dart';
 
@@ -37,9 +38,6 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> toggleTaskStatus(int index) async {
-    // Note: index here usually refers to the index in the global _tasks list
-    // If indices are different (filtered lists), we need a better way (like ID)
-    // For now, let's toggle based on the object or its index in _tasks.
     _tasks[index].isCompleted = !_tasks[index].isCompleted;
     await _taskService.saveTasks(_tasks);
     notifyListeners();
@@ -63,6 +61,12 @@ class TaskProvider with ChangeNotifier {
   Future<void> updateUserName(String name) async {
     _userName = name;
     await _taskService.saveUserName(name);
+    notifyListeners();
+  }
+
+  Future<void> clearAllTasks() async {
+    _tasks.clear();
+    await _taskService.saveTasks(_tasks);
     notifyListeners();
   }
 }
