@@ -15,7 +15,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback if TaskProvider may not be ready during initState.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final name = context.read<TaskProvider>().userName;
       _nameController.text = name;
@@ -42,13 +41,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Center(
                 child: Stack(
                   clipBehavior: Clip.none,
+                  alignment: Alignment.bottomRight,
                   children: [
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.22),
+                            color: Colors.black.withValues(alpha: 0.22),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -61,74 +61,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           radius: 55,
                           backgroundColor: Colors.grey.shade900,
                           backgroundImage: const AssetImage(
-                            "assets/images/person.png",
+                            "assets/images/car.jpg",
                           ),
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: 4,
-                      right: 4,
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF3A3A3A),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              width: 1.5,
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF3A3A3A),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.35),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            color: Colors.white.withOpacity(0.9),
-                            size: 22,
-                          ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.camera_alt_rounded,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          size: 18,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // Name field
-              const Text(
-                "User Name",
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              ),
               const SizedBox(height: 8),
-              TextField(
-                controller: _nameController,
-                style: const TextStyle(color: Colors.white, fontSize: 18),
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _updateName(),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: const Color(0xFF282828),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.check, color: Color(0xFF15B86C)),
-                    onPressed: _updateName,
-                  ),
+              Center(
+                child: Column(
+                  children: [
+                    // Name
+                    Text(
+                      context.read<TaskProvider>().userName,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "One task at a time. One step closer.",
+                      style: TextStyle(
+                        color: Color(0xffC6C6C6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 32),
 
-              // Stats
+              // const SizedBox(height: 24),
+              // TextField(
+              //   controller: _nameController,
+              //   style: const TextStyle(color: Colors.white, fontSize: 18),
+              //   textInputAction: TextInputAction.done,
+              //   onSubmitted: (_) => _updateName(),
+              //   decoration: InputDecoration(
+              //     filled: true,
+              //     fillColor: const Color(0xFF282828),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //       borderSide: BorderSide.none,
+              //     ),
+              //     suffixIcon: IconButton(
+              //       icon: const Icon(Icons.check, color: Color(0xFF15B86C)),
+              //       onPressed: _updateName,
+              //     ),
+              //   ),
+              // ),
+              SizedBox(height: 24),
+              Text(
+                "Profile Info",
+                style: TextStyle(
+                  color: const Color(0xFFFCFCFC),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              Divider(color: const Color(0xFF6e6e6e), thickness: 1, height: 1),
+              // Stts
               const Text(
                 "Statistics",
                 style: TextStyle(
@@ -173,14 +197,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _updateName() {
-    final text = _nameController.text.trim();
-    if (text.isEmpty) return;
-    context.read<TaskProvider>().updateUserName(text);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Name updated!')));
-  }
+  // void _updateName() {
+  //   final text = _nameController.text.trim();
+  //   if (text.isEmpty) return;
+  //   context.read<TaskProvider>().updateUserName(text);
+  //   ScaffoldMessenger.of(
+  //     context,
+  //   ).showSnackBar(const SnackBar(content: Text('Name updated!')));
+  // }
 
   void _showResetDialog() {
     showDialog(

@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
       children: [
         const CircleAvatar(
           radius: 24,
-          backgroundImage: AssetImage("assets/images/person.png"),
+          backgroundImage: AssetImage("assets/images/car.jpg"),
         ),
         const SizedBox(width: 12),
         Expanded(
