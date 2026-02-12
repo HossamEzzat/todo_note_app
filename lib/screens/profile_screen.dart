@@ -1,6 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_note_app/providers/task_provider.dart';
+
+import '../widgets/detailed_stats.dart';
+import '../widgets/profile_dialogs.dart';
+import '../widgets/profile_header.dart';
+import '../widgets/quick_stats.dart';
+import '../widgets/section_title.dart';
+import '../widgets/settings_card.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -9,260 +19,197 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _nameController;
+  late final TextEditingController _bioController;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  bool _isEditingName = false;
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _bioController = TextEditingController(
+      text: "One task at a time. One step closer.",
+    );
+
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+
+    _animationController.forward();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final name = context.read<TaskProvider>().userName;
       _nameController.text = name;
     });
-    _nameController = TextEditingController();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _bioController.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _profileImage = File(image.path);
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile picture updated!'),
+              backgroundColor: Color(0xFF15B86C),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to pick image'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
+  void _updateName() {
+    final text = _nameController.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Name cannot be empty'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    context.read<TaskProvider>().updateUserName(text);
+    setState(() => _isEditingName = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Name updated successfully!'),
+        backgroundColor: Color(0xFF15B86C),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Profile')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.22),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: CircleAvatar(
-                        radius: 58,
-                        backgroundColor: Colors.grey.shade800,
-                        child: CircleAvatar(
-                          radius: 55,
-                          backgroundColor: Colors.grey.shade900,
-                          backgroundImage: const AssetImage(
-                            "assets/images/car.jpg",
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF3A3A3A),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.35),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.camera_alt_rounded,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Column(
-                  children: [
-                    // Name
-                    Text(
-                      context.read<TaskProvider>().userName,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      "One task at a time. One step closer.",
-                      style: TextStyle(
-                        color: Color(0xffC6C6C6),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // const SizedBox(height: 24),
-              // TextField(
-              //   controller: _nameController,
-              //   style: const TextStyle(color: Colors.white, fontSize: 18),
-              //   textInputAction: TextInputAction.done,
-              //   onSubmitted: (_) => _updateName(),
-              //   decoration: InputDecoration(
-              //     filled: true,
-              //     fillColor: const Color(0xFF282828),
-              //     border: OutlineInputBorder(
-              //       borderRadius: BorderRadius.circular(12),
-              //       borderSide: BorderSide.none,
-              //     ),
-              //     suffixIcon: IconButton(
-              //       icon: const Icon(Icons.check, color: Color(0xFF15B86C)),
-              //       onPressed: _updateName,
-              //     ),
-              //   ),
-              // ),
-              SizedBox(height: 24),
-              Text(
-                "Profile Info",
-                style: TextStyle(
-                  color: const Color(0xFFFCFCFC),
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              Divider(color: const Color(0xFF6e6e6e), thickness: 1, height: 1),
-              // Stts
-              const Text(
-                "Statistics",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Consumer<TaskProvider>(
-                builder: (context, provider, _) {
-                  final total = provider.tasks.length;
-                  final completed = provider.completedTasks.length;
-                  return Row(
-                    children: [
-                      _buildStatCard("Total Tasks", total.toString()),
-                      const SizedBox(width: 16),
-                      _buildStatCard("Completed", completed.toString()),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 32),
-
-              // Reset button
-              SizedBox(
-                width: double.infinity,
-                child: TextButton.icon(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  onPressed: _showResetDialog,
-                  icon: const Icon(Icons.delete_forever),
-                  label: const Text("Reset App Data"),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // void _updateName() {
-  //   final text = _nameController.text.trim();
-  //   if (text.isEmpty) return;
-  //   context.read<TaskProvider>().updateUserName(text);
-  //   ScaffoldMessenger.of(
-  //     context,
-  //   ).showSnackBar(const SnackBar(content: Text('Name updated!')));
-  // }
-
-  void _showResetDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF282828),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: const Text(
-          "Clear All Data",
-          style: TextStyle(color: Colors.white),
+          'My Profile',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
-        content: const Text(
-          "Are you sure? This will delete all tasks and reset your name.",
-          style: TextStyle(color: Colors.white70),
-        ),
+        centerTitle: true,
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
+          IconButton(
+            icon: Icon(
+              _isEditingName ? Icons.check : Icons.edit,
+              color: _isEditingName ? const Color(0xFF15B86C) : Colors.white70,
+            ),
             onPressed: () {
-              // Ideally expose a clearAll() in TaskProvider.
-              context.read<TaskProvider>()
-                ..clearAllTasks()
-                ..updateUserName("User");
-              Navigator.pop(context);
+              if (_isEditingName) {
+                _updateName();
+              } else {
+                setState(() => _isEditingName = true);
+              }
             },
-            child: const Text("Clear", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ProfileHeader(
+                  profileImage: _profileImage,
+                  bioController: _bioController,
+                  nameController: _nameController,
+                  isEditingName: _isEditingName,
+                  onPickImage: _pickImage,
+                  onUpdateName: _updateName,
+                ),
+                const SizedBox(height: 32),
+                const QuickStats(),
+                const SizedBox(height: 32),
+                const SectionTitle(title: "Account Settings"),
+                const SizedBox(height: 12),
+                SettingsCard(
+                  onUserDetailsPressed: () =>
+                      ProfileDialogs.showUserDetailsDialog(context),
+                  onLogoutPressed: () =>
+                      ProfileDialogs.showLogoutDialog(context),
+                ),
+                const SizedBox(height: 32),
+                const SectionTitle(title: "Statistics"),
+                const SizedBox(height: 12),
+                const DetailedStats(),
+                const SizedBox(height: 32),
+                _buildResetButton(),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildStatCard(String label, String value) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF282828),
-          borderRadius: BorderRadius.circular(16),
+  Widget _buildResetButton() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
+      ),
+      child: TextButton.icon(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.redAccent,
+          padding: const EdgeInsets.symmetric(vertical: 14),
         ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: Color(0xFF15B86C),
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
-            ),
-          ],
+        onPressed: () => ProfileDialogs.showResetDialog(context),
+        icon: const Icon(Icons.delete_forever, size: 22),
+        label: const Text(
+          "Reset All Data",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );
