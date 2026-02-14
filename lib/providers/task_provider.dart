@@ -8,6 +8,12 @@ class TaskProvider with ChangeNotifier {
   List<TaskModel> _tasks = [];
   String _userName = "User";
   bool _isLoading = true;
+  int get totalTasks => _tasks.length;
+  int get doneTasks => _tasks.where((t) => t.isCompleted).length;
+  int get pendingTasks => totalTasks - doneTasks;
+
+  double get completionPercentage =>
+      totalTasks == 0 ? 0.0 : (doneTasks / totalTasks);
 
   List<TaskModel> get tasks => _tasks;
   List<TaskModel> get todoTasks => _tasks.where((t) => !t.isCompleted).toList();

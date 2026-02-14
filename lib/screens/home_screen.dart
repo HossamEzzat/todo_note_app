@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,6 +41,69 @@ class HomeScreen extends StatelessWidget {
                   _buildHeader(provider.userName),
                   const SizedBox(height: 32),
                   _buildGreeting(),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xff282828),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Achieved Tasks",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              "${provider.doneTasks} Out of ${provider.totalTasks} Done",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xffc6c6c6),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Stack(
+                          alignment: AlignmentGeometry.center,
+                          children: [
+                            Transform.rotate(
+                              angle: -pi / 2,
+                              child: SizedBox(
+                                height: 48,
+                                width: 48,
+                                child: CircularProgressIndicator(
+                                  value: provider.completionPercentage,
+                                  backgroundColor: Color(0xFF6D6D6D),
+                                  valueColor: AlwaysStoppedAnimation(
+                                    Color(0xff15B86C),
+                                  ),
+                                  strokeWidth: 5,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "${(provider.completionPercentage * 100).toStringAsFixed(0)}%",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   const Text(
                     "My Tasks",
