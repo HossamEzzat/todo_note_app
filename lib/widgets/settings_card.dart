@@ -36,7 +36,7 @@ class SettingsCard extends StatelessWidget {
             trailing: Switch(
               value: true,
               onChanged: (value) {},
-              activeColor: const Color(0xFF15B86C),
+              activeThumbColor: const Color(0xFF15B86C),
             ),
           ),
           _buildDivider(),

@@ -1,6 +1,5 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_note_app/models/task_model.dart';
@@ -114,28 +113,127 @@ class _AddTaskState extends State<AddTask> {
                         cursorColor: const Color(0xffFFFCFC),
                       ),
                       const SizedBox(height: 20),
+                      Text(
+                        "Task Priority",
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xffFFFCFC),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "High Priority",
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xffFFFCFC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (isHighPriority) {
+                                  HapticFeedback.lightImpact();
+                                  setState(() => isHighPriority = false);
+                                }
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: !isHighPriority
+                                      ? const Color(0xff15b86c).withOpacity(0.1)
+                                      : const Color(0xff282828),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: !isHighPriority
+                                        ? const Color(0xff15b86c)
+                                        : const Color(0xff3a3a3a),
+                                    width: !isHighPriority ? 1.5 : 1,
+                                  ),
+                                  boxShadow: !isHighPriority
+                                      ? [
+                                          BoxShadow(
+                                            color: const Color(
+                                              0xff15b86c,
+                                            ).withOpacity(0.2),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Center(
+                                  child: AnimatedDefaultTextStyle(
+                                    duration: const Duration(milliseconds: 200),
+                                    style: GoogleFonts.poppins(
+                                      color: !isHighPriority
+                                          ? const Color(0xff15b86c)
+                                          : const Color(0xffA0A0A0),
+                                      fontWeight: !isHighPriority
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                      fontSize: !isHighPriority ? 15 : 14,
+                                    ),
+                                    child: const Text("Normal"),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          Switch(
-                            value: isHighPriority,
-                            activeThumbColor: Colors.white,
-                            activeTrackColor: const Color(0xff15b86c),
-                            inactiveTrackColor: const Color(0xff6D6D6D),
-                            inactiveThumbColor: Colors.grey,
-                            onChanged: (value) {
-                              setState(() {
-                                isHighPriority = value;
-                              });
-                            },
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (!isHighPriority) {
+                                  HapticFeedback.lightImpact();
+                                  setState(() => isHighPriority = true);
+                                }
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isHighPriority
+                                      ? Colors.redAccent.withOpacity(0.1)
+                                      : const Color(0xff282828),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isHighPriority
+                                        ? Colors.redAccent
+                                        : const Color(0xff3a3a3a),
+                                    width: isHighPriority ? 1.5 : 1,
+                                  ),
+                                  boxShadow: isHighPriority
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.redAccent.withOpacity(
+                                              0.2,
+                                            ),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Center(
+                                  child: AnimatedDefaultTextStyle(
+                                    duration: const Duration(milliseconds: 200),
+                                    style: GoogleFonts.poppins(
+                                      color: isHighPriority
+                                          ? Colors.redAccent
+                                          : const Color(0xffA0A0A0),
+                                      fontWeight: isHighPriority
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                      fontSize: isHighPriority ? 15 : 14,
+                                    ),
+                                    child: const Text("High"),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),

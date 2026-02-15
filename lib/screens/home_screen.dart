@@ -1,129 +1,165 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_note_app/providers/task_provider.dart';
 import 'package:todo_note_app/screens/add_task.dart';
+import 'package:todo_note_app/widgets/AchievedTasksCard.dart';
 import 'package:todo_note_app/widgets/List_tasks_widget.dart';
+import 'package:todo_note_app/widgets/highpriorty_tasks_widget.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddTask()),
-          );
-        },
-        label: const Text(
-          "Add Task",
-          style: TextStyle(fontWeight: FontWeight.bold),
+      backgroundColor: const Color(0xFF121212),
+      floatingActionButton: ScaleTransition(
+        scale: _fadeAnimation,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddTask()),
+            );
+          },
+          label: Text(
+            "Add Task",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+          icon: const Icon(Icons.add_rounded, size: 22),
+          backgroundColor: const Color(0xFF15B86C),
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-        icon: const Icon(Icons.add),
-        backgroundColor: const Color(0xFF15B86C),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Consumer<TaskProvider>(
-            builder: (context, provider, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(provider.userName),
-                  const SizedBox(height: 32),
-                  _buildGreeting(),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Color(0xff282828),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Consumer<TaskProvider>(
+                builder: (context, provider, _) {
+                  return CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Achieved Tasks",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                              ),
+                            _buildHeader(provider.userName),
+                            const SizedBox(height: 32),
+                            _buildGreeting(),
+                            const SizedBox(height: 24),
+                            AchievedTasksCard(
+                              doneTasks: provider.doneTasks,
+                              totalTasks: provider.tasks.length,
+                              completionPercentage:
+                                  provider.completionPercentage,
                             ),
-                            Text(
-                              "${provider.doneTasks} Out of ${provider.totalTasks} Done",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xffc6c6c6),
-                              ),
+                            const SizedBox(height: 12),
+                            HighpriortyTasksWidget(
+                              highPriorityTasks: provider.highPriorityTasks,
+                              onTaskTap: (task) {
+                                // Navigate to task detail or edit
+                              },
                             ),
-                          ],
-                        ),
-                        Stack(
-                          alignment: AlignmentGeometry.center,
-                          children: [
-                            Transform.rotate(
-                              angle: -pi / 2,
-                              child: SizedBox(
-                                height: 48,
-                                width: 48,
-                                child: CircularProgressIndicator(
-                                  value: provider.completionPercentage,
-                                  backgroundColor: Color(0xFF6D6D6D),
-                                  valueColor: AlwaysStoppedAnimation(
-                                    Color(0xff15B86C),
+                            const SizedBox(height: 24),
+                            Row(
+                              children: [
+                                Text(
+                                  "My Tasks",
+                                  style: GoogleFonts.poppins(
+                                    color: const Color(0xFFFFFCFC),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.3,
                                   ),
-                                  strokeWidth: 5,
                                 ),
-                              ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF282828),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    "${provider.tasks.length}",
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xFF15B86C),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              "${(provider.completionPercentage * 100).toStringAsFixed(0)}%",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            ),
+                            const SizedBox(height: 16),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    "My Tasks",
-                    style: TextStyle(
-                      color: Color(0xFFFFFCFC),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: ListTasksWidget(
-                      tasks: provider.tasks,
-                      toggleTask: (task) => provider.toggleTaskState(task),
-                      deleteTask: (task) => provider.deleteTask(task),
-                    ),
-                  ),
-                ],
-              );
-            },
+                      ),
+                      SliverFillRemaining(
+                        hasScrollBody: true,
+                        child: ListTasksWidget(
+                          tasks: provider.tasks,
+                          toggleTask: (task) => provider.toggleTaskState(task),
+                          deleteTask: (task) => provider.deleteTask(task),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -133,47 +169,86 @@ class HomeScreen extends StatelessWidget {
   Widget _buildHeader(String userName) {
     return Row(
       children: [
-        const CircleAvatar(
-          radius: 24,
-          backgroundImage: AssetImage("assets/images/car.jpg"),
+        Hero(
+          tag: 'profile_avatar',
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFF15B86C).withOpacity(0.3),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF15B86C).withOpacity(0.2),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: const CircleAvatar(
+              radius: 26,
+              backgroundImage: AssetImage("assets/images/car.jpg"),
+            ),
+          ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Good Evening, $userName",
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.poppins(
                   color: const Color(0xFFFFFCFC),
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   fontSize: 16,
+                  letterSpacing: 0.2,
                 ),
               ),
-              const Text(
+              const SizedBox(height: 2),
+              Text(
                 "One task at a time. One step closer.",
-                style: TextStyle(color: Color(0xFFC6C6C6), fontSize: 13),
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFFC6C6C6),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            color: Color(0xFF1F1F1F),
-            shape: BoxShape.circle,
+        TweenAnimationBuilder<double>(
+          duration: const Duration(seconds: 2),
+          tween: Tween(begin: 0.0, end: 1.0),
+          builder: (context, value, child) {
+            return Transform.rotate(angle: value * 0.5, child: child);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF282828),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.orangeAccent.withOpacity(0.2)),
+            ),
+            child: const Icon(
+              Icons.sunny,
+              color: Colors.orangeAccent,
+              size: 22,
+            ),
           ),
-          child: const Icon(Icons.sunny, color: Colors.orangeAccent, size: 20),
         ),
       ],
     );
   }
 
   Widget _buildGreeting() {
-    final textStyle = GoogleFonts.plusJakartaSans(
+    final textStyle = GoogleFonts.poppins(
       color: const Color(0xFFFFFCFC),
       fontSize: 28,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w600,
+      height: 1.3,
+      letterSpacing: 0.3,
     );
 
     return Column(
@@ -183,7 +258,18 @@ class HomeScreen extends StatelessWidget {
         Row(
           children: [
             Text("almost done! ", style: textStyle),
-            SvgPicture.asset("assets/images/hand.svg", height: 28),
+            TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 1500),
+              tween: Tween(begin: 0.0, end: 1.0),
+              curve: Curves.elasticOut,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: 0.8 + (value * 0.2),
+                  child: child,
+                );
+              },
+              child: SvgPicture.asset("assets/images/hand.svg", height: 30),
+            ),
           ],
         ),
       ],

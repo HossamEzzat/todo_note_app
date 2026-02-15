@@ -22,6 +22,9 @@ class TaskProvider with ChangeNotifier {
   String get userName => _userName;
   bool get isLoading => _isLoading;
 
+  List<TaskModel> get highPriorityTasks =>
+      _tasks.where((t) => t.isHighPriority && !t.isCompleted).toList();
+
   TaskProvider() {
     loadData();
   }
